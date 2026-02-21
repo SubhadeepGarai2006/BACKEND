@@ -1,4 +1,5 @@
 require("dotenv").config();
+require("dns").setDefaultResultOrder("ipv4first");
 const MongoStore = require("connect-mongo").default;
 const express = require("express");
 const app = express();
@@ -32,18 +33,11 @@ const hostRoutes = require("./routes/host");
 const adminRoutes = require("./routes/admin");
 
 
-// const MONGO_URL = "mongodb://127.0.0.1:27017/wanderlust";
-// const dburl = process.env.ATLASDB_URL;
 
 const staticRoutes = require("./routes/static.js");
 
 
-//  DB CONNECT 
-// async function main() {
-//     await mongoose.connect(dburl);
-//     console.log(" Connected to MongoDB Atlas");
-// }
-// main().catch(err => console.log(err));
+
 
 
 //  VIEW ENGINE 
@@ -150,22 +144,29 @@ app.use((err, req, res, next) => {
 
 
 //  SERVER 
-// app.listen(8080, "0.0.0.0", () => {
-//     console.log(" Server running on http://localhost:8080");
-// });// DB CONNECT & SERVER START
+
 const dburl = process.env.ATLASDB_URL;
 
 async function startServer() {
     try {
+        // await mongoose.connect(dburl, {
+        //     serverSelectionTimeoutMS: 30000
+        // });
+
+
         await mongoose.connect(dburl, {
-            serverSelectionTimeoutMS: 30000
+            serverSelectionTimeoutMS: 30000,
+            family: 4
         });
 
         console.log("✅ Connected to MongoDB Atlas");
 
-        app.listen(8080, "0.0.0.0", () => {
-            console.log("🚀 Server running on http://localhost:8080");
-        });
+        // app.listen(8080, "0.0.0.0", () => {
+        //     console.log("🚀 Server running on http://localhost:8080");
+        // });
+
+        const PORT = process.env.PORT || 8080;
+        app.listen(PORT, () => console.log("Server running on port " + PORT));
 
 
 
