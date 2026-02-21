@@ -149,24 +149,19 @@ const dburl = process.env.ATLASDB_URL;
 
 async function startServer() {
     try {
-        // await mongoose.connect(dburl, {
-        //     serverSelectionTimeoutMS: 30000
-        // });
-
-
         await mongoose.connect(dburl, {
-            serverSelectionTimeoutMS: 30000,
-            family: 4
+            serverSelectionTimeoutMS: 30000
         });
+
+
+
 
         console.log("✅ Connected to MongoDB Atlas");
 
-        // app.listen(8080, "0.0.0.0", () => {
-        //     console.log("🚀 Server running on http://localhost:8080");
-        // });
+        app.listen(8080, "0.0.0.0", () => {
+            console.log("🚀 Server running on http://localhost:8080");
+        });
 
-        const PORT = process.env.PORT || 8080;
-        app.listen(PORT, () => console.log("Server running on port " + PORT));
 
 
 
