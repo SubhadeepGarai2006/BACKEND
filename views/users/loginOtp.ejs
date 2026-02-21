@@ -1,0 +1,18 @@
+<% layout("/layouts/boilerplate") %>
+
+    <div class="container col-md-4 mt-5">
+        <div class="card p-4 shadow">
+
+            <h3 class="text-center mb-3">Enter Login OTP</h3>
+
+            <form action="/login-otp" method="POST">
+                <input type="text" name="otp" class="form-control mb-3" placeholder="Enter OTP" required>
+                <button class="btn btn-success w-100">Verify & Login</button>
+            </form>
+
+            <p class="text-center mt-3 text-muted">
+                OTP valid for 5 minutes
+            </p>
+
+        </div>
+    </div>

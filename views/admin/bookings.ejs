@@ -1,0 +1,102 @@
+<% layout("/layouts/boilerplate") %>
+
+    <div class="container mt-5">
+
+
+        <h2 class="text-center mb-4">All Platform Bookings</h2>
+
+        <% if(bookings.length === 0){ %>
+            <div class="alert alert-info text-center">
+                No bookings yet
+            </div>
+            <% } %>
+
+                <div class="row">
+
+                    <% bookings.forEach(b => { %>
+
+                        <div class="col-md-6 col-lg-4">
+                            <div class="card shadow-sm m-3">
+
+                                <!-- ===== IMAGE ===== -->
+                                <img src="<%= b.listing?.image?.url || 'https://images.unsplash.com/photo-1566073771259-6a8506099945' %>" class="card-img-top" style="height:200px; object-fit:cover;">
+
+                                <div class="card-body">
+
+                                    <!-- ===== TITLE ===== -->
+                                    <h5 class="card-title">
+                                        <%= b.listing?.title || "Property Removed" %>
+                                    </h5>
+
+                                    <!-- ===== LOCATION ===== -->
+                                    <p>
+                                        <b>Location:</b>
+                                        <%= b.listing?.location || "N/A" %>,
+                                            <%= b.listing?.country || "" %>
+                                    </p>
+
+                                    <!-- ===== HOST ===== -->
+                                    <p>
+                                        <b>Host Seller:</b>
+                                        <%= b.listing?.owner?.email 
+                        ? b.listing.owner.email.split("@")[0] 
+                        : "Host Deleted" %>
+                                            <br>
+                                            <small class="text-muted">
+                        <%= b.listing?.owner?.email || "" %>
+                    </small>
+                                    </p>
+
+                                    <!-- ===== USER WHO BOOKED ===== -->
+                                    <p>
+                                        <b>Booked By:</b>
+                                        <%= b.user?.email || "Deleted user" %>
+                                    </p>
+
+                                    <p><b>Guests:</b>
+                                        <%= b.guests %>
+                                    </p>
+
+                                    <p>
+                                        <b>From:</b>
+                                        <%= new Date(b.fromDate).toDateString() %>
+                                    </p>
+
+                                    <p>
+                                        <b>To:</b>
+                                        <%= new Date(b.toDate).toDateString() %>
+                                    </p>
+
+                                    <hr>
+
+                                    <h6>Payment Info</h6>
+
+                                    <p>Room Price: ₹
+                                        <%= b.basePrice %>
+                                    </p>
+                                    <p>Platform Fee: ₹
+                                        <%= b.platformFee %>
+                                    </p>
+                                    <p>GST: ₹
+                                        <%= b.gst %>
+                                    </p>
+
+                                    <h5>Total Paid: ₹
+                                        <%= b.totalPrice %>
+                                    </h5>
+
+                                    <small>Payment ID: <%= b.paymentId || "N/A" %></small>
+
+                                    <br><br>
+                                    <span class="badge bg-success">Confirmed</span>
+
+                                </div>
+                            </div>
+                        </div>
+
+                        <% }) %>
+
+                </div>
+
+
+    </div>

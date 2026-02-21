@@ -1,0 +1,94 @@
+<% layout("/layouts/boilerplate") %>
+
+    <div class="container mt-5">
+        <h2 class="mb-4 text-center">Host Dashboard</h2>
+
+        <% if(bookings.length === 0){ %>
+            <div class="alert alert-info text-center">
+                No bookings on your properties yet.
+            </div>
+            <% } %>
+
+                <div class="row">
+
+                    <% bookings.forEach(b => { %>
+
+                        <div class="col-md-6 col-lg-4">
+                            <div class="card shadow-sm m-3">
+
+                                <!-- SNAPSHOT IMAGE -->
+                                <img src="<%= b.listing?.image?.url || 'https://images.unsplash.com/photo-1566073771259-6a8506099945' %>" class="card-img-top" style="height:200px; object-fit:cover;">
+
+
+                                <div class="card-body">
+
+                                    <!-- SNAPSHOT TITLE -->
+                                    <h5 class="card-title">
+                                        <%= b.listingTitle %>
+                                    </h5>
+
+                                    <!-- SNAPSHOT LOCATION -->
+                                    <p class="text-muted mb-1">
+                                        <i class="fa-solid fa-location-dot text-danger"></i>
+                                        <%= b.listingLocation %>,
+                                            <%= b.listingCountry %>
+                                    </p>
+
+                                    <p><b>Booked By:</b>
+                                        <%= b.user ? b.user.email : "Unknown / Deleted User" %>
+                                    </p>
+
+                                    <p><b>Guests:</b>
+                                        <%= b.guests %>
+                                    </p>
+
+                                    <p>
+                                        <b>Room Type:</b>
+                                        <span class="badge bg-primary">
+                            <%= b.roomPlan %>
+                        </span>
+                                    </p>
+
+                                    <form action="/host/booking/<%= b._id %>?_method=DELETE" method="POST">
+                                        <button class="btn btn-danger btn-sm mt-2">
+                            Cancel Booking
+                        </button>
+                                    </form>
+
+                                    <p><b>From:</b>
+                                        <%= new Date(b.fromDate).toDateString() %>
+                                    </p>
+                                    <p><b>To:</b>
+                                        <%= new Date(b.toDate).toDateString() %>
+                                    </p>
+
+                                    <hr>
+
+                                    <h5>Payment Info</h5>
+                                    <p>Room Price: ₹
+                                        <%= b.basePrice %>
+                                    </p>
+                                    <p>Platform Fee: ₹
+                                        <%= b.platformFee %>
+                                    </p>
+                                    <p>GST: ₹
+                                        <%= b.gst %>
+                                    </p>
+
+                                    <h5>Total Paid: ₹
+                                        <%= b.totalPrice %>
+                                    </h5>
+
+                                    <small>Payment ID: <%= b.paymentId || "N/A" %></small>
+
+                                    <br><br>
+                                    <span class="badge bg-success">Confirmed</span>
+
+                                </div>
+                            </div>
+                        </div>
+
+                        <% }) %>
+
+                </div>
+    </div>

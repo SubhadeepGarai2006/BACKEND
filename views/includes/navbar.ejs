@@ -1,0 +1,168 @@
+<nav class="navbar navbar-expand-md bg-white border-bottom mb-4 sticky-top shadow-sm">
+    <div class="container-fluid">
+
+        <!-- LOGO -->
+        <a class="navbar-brand fw-bold" href="/">
+            <i class="fa-solid fa-compass text-danger"></i> Wanderlust
+        </a>
+
+        <!-- TOGGLER -->
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNavAltMarkup">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+
+        <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
+
+            <!-- LEFT SIDE LINKS -->
+            <div class="navbar-nav">
+
+                <a class="nav-link" href="/">Home</a>
+                <a class="nav-link" href="/listings">Explore</a>
+
+                <!-- HOST FEATURES -->
+                <% if(currentUser && currentUser.role === "host"){ %>
+                    <a class="nav-link text-success fw-semibold" href="/listings/new">
+                        <i class="fa-solid fa-plus"></i> Add Listing
+                    </a>
+
+                    <a class="nav-link text-primary fw-semibold" href="/host/dashboard">
+                        <i class="fa-solid fa-chart-line"></i> Host Panel
+                    </a>
+
+
+                    <li class="nav-item">
+                        <a class="nav-link" href="/listings/my">My Listings</a>
+                    </li>
+                    <% } %>
+
+                        <!-- ADMIN FEATURES -->
+                        <% if(currentUser && currentUser.role === "admin"){ %>
+
+                            <a class="nav-link text-warning fw-semibold" href="/admin/dashboard">
+                                <i class="fa-solid fa-user-shield"></i> Admin Panel
+                            </a>
+
+                            <a class="nav-link text-danger fw-semibold" href="/admin/moderation">
+                                <i class="fa-solid fa-list-check"></i> Review Listings
+                            </a>
+
+                            <a class="nav-link text-primary fw-semibold" href="/admin/bookings">
+                                <i class="fa-solid fa-calendar-check"></i> All Bookings
+                            </a>
+
+                            <% } %>
+
+                                <form class="d-flex ms-3" action="/listings/search" method="GET">
+                                    <input class="form-control me-2" type="search" name="title" placeholder="Search listings..." required>
+                                    <button class="btn btn-dark">Search</button>
+                                </form>
+
+
+
+                                <% if(currentUser){ %>
+
+                                    <!-- MY BOOKINGS BUTTON -->
+                                    <li class="nav-item">
+                                        <a class="nav-link" href="/bookings/my-bookings">
+                                            <i class="fa-solid fa-bed"></i> My Bookings
+                                        </a>
+                                    </li>
+
+                                    <% } %>
+
+
+
+
+            </div>
+
+            <!-- RIGHT SIDE -->
+            <ul class="navbar-nav ms-auto align-items-center">
+
+                <% if(!currentUser){ %>
+
+                    <li class="nav-item">
+                        <a class="nav-link" href="/login">Login</a>
+                    </li>
+
+                    <li class="nav-item">
+                        <a class="nav-link btn btn-danger text-white px-3 ms-2" href="/signup">
+                            Sign Up
+                        </a>
+                    </li>
+
+                    <% } else { %>
+
+                        <!-- USER EMAIL -->
+                        <li class="nav-item me-3">
+                            <span class="navbar-text text-dark fw-semibold">
+                            <i class="fa-solid fa-user"></i>
+                            <%= currentUser.email %>
+                        </span>
+                        </li>
+
+                        <!-- ROLE BADGE -->
+                        <li class="nav-item me-3">
+
+                            <% if(currentUser.role === "admin"){ %>
+                                <span class="badge bg-danger">Admin</span>
+
+                                <% } else if(currentUser.role === "host"){ %>
+                                    <span class="badge bg-success">Host</span>
+
+                                    <% } else { %>
+                                        <span class="badge bg-secondary">Customer</span>
+                                        <% } %>
+
+                        </li>
+
+                        <!-- LOGOUT -->
+                        <li class="nav-item">
+                            <a class="nav-link text-danger fw-semibold" href="/logout">
+                                <i class="fa-solid fa-right-from-bracket"></i> Logout
+                            </a>
+
+
+                        </li>
+
+
+
+
+                        <li class="nav-item ">
+
+                            <form action="/delete-account?_method=DELETE" method="POST" onsubmit="return confirm('⚠️ This will permanently delete your account, listings and bookings. Continue?');">
+
+                                <button class="btn btn-sm btn-outline-danger">
+    <i class="fa-solid fa-user-xmark"></i> Delete Account
+</button>
+
+                            </form>
+
+                        </li>
+
+                        <% } %>
+
+            </ul>
+
+        </div>
+    </div>
+</nav>
+
+
+
+<div class="container mt-2">
+
+    <% if(success && success.length > 0){ %>
+        <div class="alert alert-success alert-dismissible fade show">
+            <%= success %>
+                <button class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+        <% } %>
+
+            <% if(error && error.length > 0){ %>
+                <div class="alert alert-danger alert-dismissible fade show">
+                    <%= error %>
+                        <button class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+                <% } %>
+
+</div>

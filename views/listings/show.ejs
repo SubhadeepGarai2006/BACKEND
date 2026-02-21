@@ -1,0 +1,338 @@
+<% layout("/layouts/boilerplate") %>
+
+    <div class="container mt-5">
+        <div class="row justify-content-center">
+            <div class="col-lg-8 col-md-10">
+
+                <div class="card shadow-sm">
+
+                    <!-- Image -->
+                    <img src="<%= listing.image.url %>" class="card-img-top" style="height:22rem; object-fit:cover;">
+
+                    <div class="card-body">
+
+                        <!-- Title -->
+                        <h3 class="card-title mb-3">
+                            <%= listing.title %>
+                        </h3>
+
+                        <!-- Seller -->
+                        <p>
+                            <b>Seller:</b>
+                            <% if(listing.owner && listing.owner.email){ %>
+                                <% let name = listing.owner.email.split("@")[0]; %>
+                                    <%= name.charAt(0).toUpperCase() + name.slice(1) %>
+                                        <% } else { %>
+                                            Unknown Host
+                                            <% } %>
+                        </p>
+
+                        <!-- Description -->
+                        <p class="text-muted">
+                            <%= listing.description %>
+                        </p>
+
+
+                        <!-- Room Plans -->
+                        <h4 class="mt-4">Room Plan</h4>
+                        <div class="row">
+                            <% if(listing.roomPlans && listing.roomPlans.length > 0){ %>
+
+                                <div class="row">
+                                    <% listing.roomPlans.forEach((plan)=>{ %>
+                                        <div class="col-md-6">
+                                            <label class="border rounded p-3 w-100 plan-card">
+
+                <input type="radio"
+                       name="roomPlan"
+                       value="<%= plan.name %>"
+                       data-price="<%= plan.extraPrice %>"
+                       hidden>
+
+                <h5><%= plan.name %></h5>
+                <p>Extra: ₹<%= plan.extraPrice %></p>
+
+                <h6>
+                    Total per night:
+                    ₹<%= listing.price + plan.extraPrice %>
+                </h6>
+
+            </label>
+                                        </div>
+                                        <% }) %>
+                                </div>
+
+                                <% } else { %>
+
+                                    <p class="text-muted">No room plans available.</p>
+
+                                    <% } %>
+
+                        </div>
+
+
+                        <!-- Base Price -->
+                        <h4 id="basePrice" data-price="<%= listing.price %>">
+                            ₹
+                            <%= listing.price %> / night
+                        </h4>
+
+                        <button class="price-btn mt-2" onclick="showFinalPrice()">
+                        <i class="fa-solid fa-calculator"></i> Show Final Price
+                    </button>
+
+                        <h5 class="mt-3 text-success" id="finalPrice"></h5>
+
+
+                        <!-- Availability -->
+                        <div class="mb-3">
+                            <% if(unavailable){ %>
+                                <span class="badge bg-danger">Currently Booked</span>
+                                <% } else { %>
+                                    <span class="badge bg-success">Available</span>
+                                    <% } %>
+                        </div>
+
+                        <!-- Location -->
+                        <p>
+                            <i class="fa-solid fa-location-dot"></i>
+                            <%= listing.location %>,
+                                <%= listing.country %>
+                        </p>
+
+                        <!-- ===== MAP (IMPORTANT) ===== -->
+                        <div id="map" class="mt-3 mb-4"></div>
+                        <p id="mapError" class="text-danger" style="display:none;">
+                            Location map not available
+                        </p>
+
+
+                        <hr>
+
+
+                        <!-- BOOKING DATE PICKER -->
+                        <div class="mb-3">
+                            <label class="form-label"><b>Select Booking Dates</b></label>
+                            <input type="text" id="datePicker" class="form-control" placeholder="Choose check-in and check-out">
+                            <small class="text-muted">Red dates are already booked</small>
+                        </div>
+
+
+                        <!-- Book Button -->
+                        <% if(!unavailable && currentUser){ %>
+                            <a href="/bookings/<%= listing._id %>" class="btn btn-success" onclick="saveDates()">
+                            Pay & Book Now
+                        </a>
+                            <% } else { %>
+                                <button class="btn btn-secondary" disabled>Not Available</button>
+                                <% } %>
+
+                                    <br><br>
+
+                                    <!-- Edit/Delete -->
+                                    <% if(currentUser && listing.owner && currentUser._id.equals(listing.owner._id)){ %>
+                                        <div class="d-flex gap-3 mb-4">
+                                            <a href="/listings/<%= listing._id %>/edit" class="btn btn-outline-primary">
+                                Edit Listing
+                            </a>
+
+                                            <form method="POST" action="/listings/<%= listing._id %>?_method=DELETE">
+                                                <button class="btn btn-outline-danger">Delete Listing</button>
+                                            </form>
+                                        </div>
+                                        <% } %>
+
+
+                                            <!-- Review Form -->
+                                            <% if(currentUser){ %>
+                                                <h4>Leave a Review</h4>
+                                                <form action="/listings/<%= listing._id %>/reviews" method="POST" class="mb-4">
+
+                                                    <div class="mb-3">
+                                                        <label class="form-label">Rating</label>
+                                                        <select class="form-select" name="review[rating]" required>
+                                    <option disabled selected>Select rating</option>
+                                    <option value="1">⭐ 1</option>
+                                    <option value="2">⭐⭐ 2</option>
+                                    <option value="3">⭐⭐⭐ 3</option>
+                                    <option value="4">⭐⭐⭐⭐ 4</option>
+                                    <option value="5">⭐⭐⭐⭐⭐ 5</option>
+                                </select>
+                                                    </div>
+
+                                                    <div class="mb-3">
+                                                        <label class="form-label">Comment</label>
+                                                        <textarea class="form-control" name="review[comment]" rows="3" required></textarea>
+                                                    </div>
+
+                                                    <button class="btn btn-primary">Submit Review</button>
+                                                </form>
+                                                <% } %>
+
+
+                                                    <hr>
+
+                                                    <h4 class="mb-3">All Reviews</h4>
+
+                                                    <div class="row">
+
+                                                        <% if(!listing.reviews || listing.reviews.length === 0){ %>
+
+                                                            <p class="text-muted">No reviews yet.</p>
+
+                                                            <% } else { %>
+
+                                                                <% for(let review of listing.reviews){ %>
+
+                                                                    <div class="col-md-6 col-lg-4 mb-3">
+                                                                        <div class="card h-100 shadow-sm position-relative">
+
+                                                                            <!-- 🗑 DELETE BUTTON -->
+                                                                            <% if(currentUser && review.author && currentUser._id.equals(review.author._id)){ %>
+
+                                                                                <form method="POST" action="/listings/<%= listing._id %>/reviews/<%= review._id %>?_method=DELETE" class="position-absolute top-0 end-0 m-2">
+
+                                                                                    <button class="btn btn-sm btn-outline-danger" onclick="return confirm('Delete this review?')">
+
+                            <i class="fa-solid fa-trash"></i>
+
+                        </button>
+                                                                                </form>
+
+                                                                                <% } %>
+
+                                                                                    <div class="card-body">
+
+                                                                                        <!-- ⭐ Rating Stars -->
+                                                                                        <h6 class="mb-1">
+                                                                                            Rating:
+                                                                                            <%= "⭐".repeat(review.rating) %>
+                                                                                        </h6>
+
+                                                                                        <!-- 👤 Username -->
+                                                                                        <p class="text-muted mb-1">
+                                                                                            <% if(review.author && review.author.email){ %>
+                                                                                                <%= review.author.email.split("@")[0] %>
+                                                                                                    <% } else { %>
+                                                                                                        Anonymous
+                                                                                                        <% } %>
+                                                                                        </p>
+
+                                                                                        <!-- 💬 Comment -->
+                                                                                        <p><b>Comment:</b>
+                                                                                            <%= review.comment %>
+                                                                                        </p>
+
+                                                                                    </div>
+
+                                                                        </div>
+                                                                    </div>
+
+                                                                    <% } %>
+
+                                                                        <% } %>
+
+                                                    </div>
+
+
+
+                    </div>
+                </div>
+            </div>
+        </div>
+
+
+        <!-- ===== YOUR EXISTING SCRIPTS (UNCHANGED) ===== -->
+        <script src="/js/price.js"></script>
+
+        <script>
+            const bookedDates = JSON.parse('<%- JSON.stringify(bookedDates || []) %>');
+
+            function saveDates() {
+                localStorage.setItem("bookedDates", JSON.stringify(bookedDates));
+            }
+        </script>
+
+
+        <script>
+            const mapData = JSON.parse('<%- JSON.stringify(listing.geometry || null) %>');
+        </script>
+        <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+        <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
+        <script>
+            document.addEventListener("DOMContentLoaded", function() {
+
+                if (!mapData || !mapData.lat) {
+                    document.getElementById("map").style.display = "none";
+                    document.getElementById("mapError").style.display = "block";
+                    return;
+                }
+
+                const map = L.map("map").setView([mapData.lat, mapData.lng], 13);
+
+                L.tileLayer("https://tile.openstreetmap.org/{z}/{x}/{y}.png", {
+                    attribution: "&copy; OpenStreetMap contributors"
+                }).addTo(map);
+
+                L.marker([mapData.lat, mapData.lng])
+                    .addTo(map)
+                    .bindPopup("📍 <%= listing.title %>")
+                    .openPopup();
+            });
+        </script>
+
+
+        <style>
+            #map {
+                height: 350px;
+                width: 100%;
+                border-radius: 12px;
+                border: 1px solid #ddd;
+            }
+        </style>
+
+
+
+        <!-- FLATPICKR CALENDAR -->
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+        <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+
+        <script>
+            document.addEventListener("DOMContentLoaded", function() {
+
+                const disabledDates = JSON.parse('<%- JSON.stringify(bookedDates || []) %>');
+
+                flatpickr("#datePicker", {
+                    mode: "range",
+                    minDate: "today",
+                    dateFormat: "Y-m-d",
+
+                    // prevent selecting booked dates
+                    disable: disabledDates,
+
+                    // color booked dates RED
+                    onDayCreate: function(dObj, dStr, fp, dayElem) {
+
+                        const date = dayElem.dateObj.toLocaleDateString('en-CA');
+
+                        if (disabledDates.includes(date)) {
+                            dayElem.style.backgroundColor = "#ff4d4d";
+                            dayElem.style.color = "white";
+                            dayElem.style.borderRadius = "50%";
+                            dayElem.title = "Already Booked";
+                        }
+                    }
+                });
+
+            });
+        </script>
+
+
+
+
+
+
+
+
+    </div>

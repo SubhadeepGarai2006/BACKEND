@@ -1,0 +1,53 @@
+<% layout("/layouts/boilerplate") %>
+
+
+
+
+    <div class="container mt-5">
+
+        <h2 class="text-center mb-4">My Listings</h2>
+
+        <div class="row">
+
+            <% if(myListings.length === 0){ %>
+                <h5 class="text-center text-muted">
+                    You have not added any property yet.
+                </h5>
+                <% } %>
+
+                    <% myListings.forEach(listing => { %>
+
+                        <div class="col-md-4 mb-4">
+                            <div class="card shadow">
+
+                                <% if(listing.image && listing.image.url){ %>
+                                    <img src="<%= listing.image.url %>" class="card-img-top" style="height:220px;object-fit:cover;">
+                                    <% } else { %>
+                                        <img src="<%= listing.image %>" class="card-img-top" style="height:220px;object-fit:cover;">
+                                        <% } %>
+
+                                            <div class="card-body">
+
+                                                <h5>
+                                                    <%= listing.title %>
+                                                </h5>
+
+                                                <p class="text-muted">
+                                                    <%= listing.location %>
+                                                </p>
+
+                                                <p><b>₹ <%= listing.price %> / night</b></p>
+
+                                                <a href="/listings/<%= listing._id %>" class="btn btn-dark w-100">
+                           View Details
+                        </a>
+
+                                            </div>
+                            </div>
+                        </div>
+
+                        <% }) %>
+
+        </div>
+
+    </div>

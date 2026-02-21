@@ -1,0 +1,126 @@
+<% layout("/layouts/boilerplate") %>
+
+    <body>
+        <div class="container mt-5">
+            <div class="row justify-content-center">
+
+                <div class="col-lg-6 col-md-8">
+
+                    <div class="card shadow-sm p-4">
+                        <h3 class="mb-4 text-center">Edit Your Listing</h3>
+
+                        <form method="POST" action="/listings/<%= listing._id %>?_method=PUT" enctype="multipart/form-data" novalidate class="needs-validation">
+
+                            <div class="mb-3">
+                                <label class="form-label">Title</label>
+                                <input name="listing[title]" value="<%= listing.title %>" type="text" class="form-control" required />
+                                <div class="invalid-feedback">
+                                    Please enter a valid title.
+                                </div>
+                            </div>
+
+                            <div class="mb-3">
+                                <label class="form-label">Description</label>
+                                <textarea name="listing[description]" class="form-control" rows="3" required><%= listing.description %></textarea>
+
+                                <div class="invalid-feedback">
+                                    Please enter a valid description.
+                                </div>
+                            </div>
+
+                            <div class="mb-3">
+                                <label class="form-label">Image URL</label>
+                                <input type="file" name="image" class="form-control" accept="image/*">
+
+                                <div class="invalid-feedback">
+                                    Please enter a valid image URL.
+                                </div>
+                            </div>
+
+                            <div class="mb-3">
+                                <label class="form-label">Price (₹)</label>
+                                <input name="listing[price]" value="<%= listing.price %>" type="number" class="form-control" required />
+
+                                <div class="invalid-feedback">
+                                    Please enter a valid price.
+                                </div>
+                            </div>
+
+
+
+                            <h4 class="mt-4">Room Plans</h4>
+
+                            <div id="plansContainer">
+
+                                <% listing.roomPlans.forEach((plan, i) => { %>
+                                    <div class="plan-box mb-2">
+                                        <input type="text" name="listing[roomPlans][<%= i %>][name]" value="<%= plan.name %>" placeholder="Plan Name" class="form-control mb-1" required>
+
+                                        <input type="number" name="listing[roomPlans][<%= i %>][extraPrice]" value="<%= plan.extraPrice %>" placeholder="Extra Price" class="form-control" required>
+                                    </div>
+                                    <% }) %>
+
+                            </div>
+
+                            <button type="button" class="btn btn-sm btn-dark mt-2" onclick="addPlan()">
+    + Add Another Plan
+</button>
+
+
+
+                            <div class="mb-3">
+                                <label class="form-label">Maximum Guests Capacity</label>
+                                <input type="number" name="listing[capacity]" value="<%= listing.capacity %>" class="form-control" min="1" required>
+                            </div>
+
+
+                            <div class="mb-3">
+                                <label class="form-label">Country</label>
+                                <input name="listing[country]" value="<%= listing.country %>" type="text" class="form-control" required />
+
+                                <div class="invalid-feedback">
+                                    Please enter a valid country.
+                                </div>
+                            </div>
+
+                            <div class="mb-4">
+                                <label class="form-label">Location</label>
+                                <input name="listing[location]" value="<%= listing.location %>" type="text" class="form-control" required />
+
+                                <div class="invalid-feedback">
+                                    Please enter a valid location.
+                                </div>
+                            </div>
+
+                            <button class="btn btn-primary w-100">
+                            Update Listing
+                        </button>
+
+                        </form>
+                    </div>
+
+                </div>
+
+            </div>
+        </div>
+
+
+        <script>
+            let planIndex = 1;
+
+            function addPlan() {
+                const container = document.getElementById("plansContainer");
+
+                const html = `
+    <div class="plan-box mb-2">
+        <input type="text" name="listing[roomPlans][${planIndex}][name]" placeholder="Plan Name" class="form-control mb-1" required>
+        <input type="number" name="listing[roomPlans][${planIndex}][extraPrice]" placeholder="Extra Price" class="form-control" required>
+    </div>`;
+
+                container.insertAdjacentHTML("beforeend", html);
+                planIndex++;
+            }
+        </script>
+
+
+    </body>

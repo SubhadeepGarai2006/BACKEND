@@ -1,0 +1,33 @@
+<% layout("/layouts/boilerplate") %>
+
+    <body>
+        <h3>All Listings</h3>
+        <% if(currentUser && currentUser.role === "host"){ %>
+            <div class="alert alert-info text-center">
+                Your newly added listings will appear here after admin approval.
+            </div>
+            <% } %>
+
+
+                <div class="row row-cols-lg-3 row-cols-md-2 row-cols-sm-1 g-3">
+                    <% for (let listing of allListings) { %>
+
+                        <div class="col">
+                            <a href="/listings/<%= listing._id %>" class="listing-link text-decoration-none">
+                                <div class="card h-100">
+                                    <img src="<%= (listing.image && listing.image.url) ? listing.image.url : 'https://images.unsplash.com/photo-1566073771259-6a8506099945' %>" class="card-img-top" style="height:22rem; object-fit:cover;">
+
+                                    <DIV CLASS="card-img-overlay">Wanderlust</DIV>
+                                    <div class="card-body">
+                                        <p class="card-text">
+                                            <b><%= listing.title %></b><br> &#8377;
+                                            <%= listing.price.toLocaleString("en-IN") %>
+                                        </p>
+                                    </div>
+                                </div>
+                            </a>
+                        </div>
+
+                        <% } %>
+                </div>
+    </body>

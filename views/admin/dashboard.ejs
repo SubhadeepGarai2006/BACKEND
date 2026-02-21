@@ -1,0 +1,43 @@
+<% layout("/layouts/boilerplate") %>
+
+    <div class="container mt-5">
+        <h2 class="mb-4 text-center">Admin Panel - Hosts</h2>
+
+        <table class="table table-bordered">
+            <thead class="table-dark">
+                <tr>
+                    <th>Email</th>
+                    <th>Status</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+
+            <body>
+                <% hosts.forEach(host => { %>
+                    <tr>
+                        <td>
+                            <%= host.email %>
+                        </td>
+
+                        <td>
+                            <% if(host.blocked){ %>
+                                <span class="badge bg-danger">Blocked</span>
+                                <% } else { %>
+                                    <span class="badge bg-success">Active</span>
+                                    <% } %>
+                        </td>
+
+                        <td>
+                            <% if(!host.blocked){ %>
+                                <form action="/admin/block/<%= host._id %>?_method=PUT" method="POST">
+                                    <button class="btn btn-danger btn-sm">Block</button>
+                                </form>
+                                <% } else { %>
+                                    <span class="text-muted">No action</span>
+                                    <% } %>
+                        </td>
+                    </tr>
+                    <% }) %>
+                        </tbody>
+        </table>
+    </div>

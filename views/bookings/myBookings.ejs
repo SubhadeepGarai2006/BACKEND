@@ -1,0 +1,161 @@
+<% layout("/layouts/boilerplate") %>
+
+    <div class="container mt-5">
+
+        <h2 class="mb-4 text-center">My Bookings</h2>
+
+        <% if(bookings.length === 0){ %>
+            <div class="alert alert-info text-center">
+                You have no bookings yet.
+            </div>
+            <% } %>
+
+                <div class="row">
+
+                    <% bookings.forEach(b => { %>
+
+                        <div class="col-md-6 col-lg-4">
+                            <div class="card shadow-sm m-3">
+
+                                <!-- IMAGE -->
+                                <%
+                let imageUrl;
+
+                if (b.listing && typeof b.listing.image === "string") {
+                    imageUrl = b.listing.image;
+                } else if (b.listing && b.listing.image && b.listing.image.url) {
+                    imageUrl = b.listing.image.url;
+                } else {
+                    imageUrl = "https://images.unsplash.com/photo-1566073771259-6a8506099945";
+                }
+                %>
+
+                                    <img src="<%= imageUrl %>" class="card-img-top" style="height:200px; object-fit:cover;">
+
+                                    <div class="card-body">
+
+                                        <h4 class="card-title">
+                                            <%= b.listing ? b.listing.title : "Listing Removed" %>
+                                        </h4>
+
+                                        <p><b>Location:</b>
+                                            <%= b.listing ? b.listing.location : "N/A" %>
+                                        </p>
+                                        <% if(b.listing && b.listing.geometry && b.listing.geometry.lat){ %>
+                                            <div id="map-<%= b._id %>" class="booking-map mb-3"></div>
+                                            <% } else { %>
+                                                <p class="text-muted">Map not available</p>
+                                                <% } %>
+
+                                                    <p><b>From:</b>
+                                                        <%= new Date(b.fromDate).toDateString() %>
+                                                    </p>
+
+                                                    <p><b>To:</b>
+                                                        <%= new Date(b.toDate).toDateString() %>
+                                                    </p>
+
+                                                    <p><b>Guests:</b>
+                                                        <%= b.guests %>
+                                                    </p>
+
+                                                    <!-- ⭐ ROOM TYPE SHOW (THIS WAS YOUR MISSING PART) -->
+                                                    <p>
+                                                        <b>Room Type:</b>
+                                                        <span class="badge bg-primary">
+                            <%= b.roomPlan %>
+                        </span>
+                                                    </p>
+
+                                                    <!-- STATUS -->
+                                                    <p>
+                                                        <b>Status:</b>
+                                                        <span class="badge bg-success">
+                            <%= b.status %>
+                        </span>
+                                                    </p>
+
+                                                    <hr>
+
+                                                    <h6 class="mt-2">Payment Details</h6>
+
+                                                    <p>Room Price: ₹
+                                                        <%= b.basePrice %>
+                                                    </p>
+                                                    <p>Platform Fee: ₹
+                                                        <%= b.platformFee %>
+                                                    </p>
+                                                    <p>GST: ₹
+                                                        <%= b.gst %>
+                                                    </p>
+
+                                                    <h5>Total Paid: ₹
+                                                        <%= b.totalPrice %>
+                                                    </h5>
+
+                                                    <small class="text-muted">
+                        Payment ID: <%= b.paymentId %>
+                    </small>
+
+                                                    <!-- CANCEL -->
+                                                    <form action="/bookings/cancel/<%= b._id %>?_method=DELETE" method="POST">
+                                                        <button type="submit" class="btn btn-danger mt-2">
+                            Cancel Booking
+                        </button>
+                                                    </form>
+
+                                    </div>
+                            </div>
+                        </div>
+
+
+
+
+
+                        <% }) %>
+
+                </div>
+
+
+                <!-- Leaflet -->
+                <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+                <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
+                <script>
+                    document.addEventListener("DOMContentLoaded", function() {
+
+                        const bookings = JSON.parse('<%- JSON.stringify(bookings || []) %>');
+
+                        bookings.forEach(b => {
+
+                            if (!b.listing || !b.listing.geometry || !b.listing.geometry.lat) return;
+
+                            const mapId = "map-" + b._id;
+
+                            const map = L.map(mapId).setView(
+                                [b.listing.geometry.lat, b.listing.geometry.lng],
+                                13
+                            );
+
+                            L.tileLayer("https://tile.openstreetmap.org/{z}/{x}/{y}.png", {
+                                attribution: "&copy; OpenStreetMap contributors"
+                            }).addTo(map);
+
+                            L.marker([b.listing.geometry.lat, b.listing.geometry.lng])
+                                .addTo(map)
+                                .bindPopup("<b>" + b.listing.title + "</b><br>" + b.listing.location)
+                                .openPopup();
+                        });
+                    });
+                </script>
+
+                <style>
+                    .booking-map {
+                        height: 250px;
+                        width: 100%;
+                        border-radius: 10px;
+                        border: 1px solid #ddd;
+                    }
+                </style>
+
+    </div>

@@ -1,0 +1,192 @@
+/* =========================
+   MOBILE RESPONSIVE (PHONE)
+   ========================= */
+
+@media (max-width: 768px) {
+    /* NAVBAR */
+    .navbar {
+        height: auto;
+        padding: 10px 0;
+    }
+    .navbar-brand {
+        font-size: 1.2rem;
+    }
+    .fa-compass {
+        font-size: 1.5rem;
+    }
+    .nav-link {
+        padding: 10px 0;
+        text-align: left;
+    }
+    /* SEARCH BAR FIX */
+    .nav-search {
+        width: 100%;
+        margin-top: 10px;
+    }
+    .nav-search input {
+        width: 100%;
+    }
+    .nav-search button {
+        width: 100%;
+        margin-top: 8px;
+    }
+    /* CARDS GRID */
+    .card {
+        margin-bottom: 1.5rem;
+    }
+    /* listing image height mobile friendly */
+    .card-img-top {
+        height: 220px !important;
+        border-radius: 14px 14px 0 0 !important;
+    }
+    /* TEXT SIZE ADJUST */
+    .card-title {
+        font-size: 1.1rem;
+    }
+    .card-text {
+        font-size: 0.9rem;
+    }
+    /* PRICE BUTTON */
+    .price-btn {
+        width: 100%;
+        padding: 12px;
+        font-size: 14px;
+    }
+    /* SHOW PAGE IMAGE */
+    #map {
+        height: 250px !important;
+    }
+    /* FLASH MESSAGE */
+    .flash-msg {
+        width: 90%;
+        min-width: auto;
+        font-size: 14px;
+        padding: 10px;
+    }
+    /* FOOTER */
+    .f-info-links {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 6px;
+    }
+    .f-info-socials {
+        margin-bottom: 10px;
+    }
+    /* FORM INPUTS */
+    .form-control {
+        font-size: 14px;
+        padding: 10px;
+    }
+    /* BUTTONS */
+    .btn {
+        width: 100%;
+        margin-top: 6px;
+    }
+}
+
+
+/* ===== Sticky Footer ===== */
+
+html,
+body {
+    height: 100%;
+}
+
+body {
+    display: flex;
+    flex-direction: column;
+}
+
+main {
+    flex: 1;
+}
+
+
+/* Footer proper bottom */
+
+.footer-navbar {
+    background-color: white;
+    width: 100%;
+    margin-top: auto;
+    border-top: 1px solid #e5e5e5;
+    padding: 18px 0;
+}
+
+
+/* =========================
+   VERY SMALL DEVICES (≤480px)
+   ========================= */
+
+@media (max-width: 480px) {
+    body {
+        font-size: 14px;
+    }
+    .container {
+        padding-left: 14px;
+        padding-right: 14px;
+    }
+    .card-img-top {
+        height: 200px !important;
+    }
+    .navbar-brand {
+        font-size: 1rem;
+    }
+    .price-btn {
+        font-size: 13px;
+    }
+}
+
+
+/* =========================
+   VERY SMALL DEVICES (≤480px)
+   ========================= */
+
+@media (max-width: 480px) {
+    body {
+        font-size: 14px;
+    }
+    .container {
+        padding-left: 14px;
+        padding-right: 14px;
+    }
+    .card-img-top {
+        height: 200px !important;
+    }
+    .navbar-brand {
+        font-size: 1rem;
+    }
+    .price-btn {
+        font-size: 13px;
+    }
+}
+
+
+/* Final price button */
+
+.price-btn {
+    background: linear-gradient(135deg, #ff385c, #ff7a18);
+    color: white;
+    border: none;
+    padding: 10px 18px;
+    font-size: 15px;
+    font-weight: 600;
+    border-radius: 12px;
+    cursor: pointer;
+    transition: all 0.25s ease;
+    box-shadow: 0 6px 15px rgba(0, 0, 0, 0.15);
+}
+
+.price-btn i {
+    margin-right: 6px;
+}
+
+.price-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 10px 22px rgba(0, 0, 0, 0.25);
+    background: linear-gradient(135deg, #ff2e63, #ff9a3c);
+}
+
+.price-btn:active {
+    transform: scale(0.95);
+}

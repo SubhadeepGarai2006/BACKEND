@@ -1,0 +1,222 @@
+<% layout("/layouts/boilerplate") %>
+
+    <div class="container mt-5">
+        <div class="row justify-content-center">
+            <div class="col-lg-6 col-md-8">
+
+                <div class="card shadow-lg border-0">
+                    <div class="card-body p-4">
+
+                        <h3 class="text-center mb-4">
+                            Book: <span class="text-primary"><%= listing.title %></span>
+                        </h3>
+
+                        <!-- BOOKING FORM -->
+                        <form id="bookingForm">
+
+                            <!-- Check In -->
+                            <div class="mb-3">
+                                <label class="form-label">Check In Date</label>
+                                <input type="date" id="fromDate" name="fromDate" class="form-control" required>
+
+                            </div>
+
+                            <!-- Check Out -->
+                            <div class="mb-3">
+                                <label class="form-label">Check Out Date</label>
+                                <input type="date" id="toDate" name="toDate" class="form-control" required>
+                            </div>
+
+                            <!-- Guests -->
+                            <div class="mb-3">
+                                <label class="form-label">Number of Guests</label>
+                                <input type="number" name="guests" class="form-control" min="1" max="<%= listing.capacity %>" required>
+                                <small class="text-muted">
+                                Max allowed: <%= listing.capacity %> persons
+                            </small>
+                            </div>
+
+                            <!-- ROOM PLAN -->
+                            <h5 class="mt-4">Select Room Plan</h5>
+                            <div class="mb-3">
+
+                                <% listing.roomPlans.forEach(plan => { %>
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="radio" name="roomPlan" value="<%= plan.name %>" required>
+
+                                        <label class="form-check-label">
+                                        <b><%= plan.name %></b>
+                                        (+ ₹<%= plan.extraPrice %> per night)
+                                    </label>
+                                    </div>
+                                    <% }) %>
+
+                            </div>
+
+                            <div class="alert alert-info">
+                                <b>Base Price:</b> ₹
+                                <%= listing.price %> / night <br>
+                                    <b>Max Capacity:</b>
+                                    <%= listing.capacity %> persons
+                            </div>
+
+                            <div class="d-grid gap-2">
+                                <!-- IMPORTANT FIX -->
+                                <button type="submit" class="btn btn-success btn-lg">
+                                Confirm Booking
+                            </button>
+
+                                <a href="/listings/<%= listing._id %>" class="btn btn-outline-secondary">
+                                Cancel
+                            </a>
+                            </div>
+
+                        </form>
+
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+
+    <!-- Razorpay -->
+    <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+
+    <script>
+        const form = document.getElementById("bookingForm");
+
+        form.addEventListener("submit", async function(e) {
+            e.preventDefault();
+
+            try {
+
+                // ---------- GET FORM DATA ----------
+                const formData = new FormData(form);
+
+                // ⭐ CRITICAL FIX: manually capture selected plan
+                const selectedPlan = document.querySelector('input[name="roomPlan"]:checked');
+
+                if (!selectedPlan) {
+                    alert("Please select a room type");
+                    return;
+                }
+
+                // force send roomPlan
+                formData.set("roomPlan", selectedPlan.value);
+
+                // ---------- SAVE SESSION ----------
+                const saveRes = await fetch("/bookings/<%= listing._id %>", {
+                    method: "POST",
+                    credentials: "include",
+                    headers: {
+                        "Content-Type": "application/x-www-form-urlencoded"
+                    },
+                    body: new URLSearchParams(formData)
+                });
+
+                const saveData = await saveRes.json();
+
+                if (!saveData.success) {
+                    alert("Booking session failed. Refresh page.");
+                    return;
+                }
+
+                // ---------- CREATE ORDER ----------
+                const orderRes = await fetch("/bookings/create-order/<%= listing._id %>", {
+                    method: "POST",
+                    credentials: "include"
+                });
+
+                const order = await orderRes.json();
+
+                if (!order.id) {
+                    alert("Order creation failed");
+                    return;
+                }
+
+                // ---------- RAZORPAY ----------
+                const options = {
+                    key: "<%= razorpayKey %>",
+                    amount: order.amount,
+                    currency: "INR",
+                    name: "WanderLust",
+                    description: "Secure Room Booking",
+
+                    notes: {
+                        BasePrice: order.basePrice,
+                        GST: order.gst,
+                        PlatformFee: order.platformFee
+                    },
+
+                    prefill: {
+                        email: "<%= currentUser.email %>"
+                    },
+
+                    order_id: order.id,
+
+                    theme: {
+                        color: "#0d6efd"
+                    },
+
+                    handler: async function(response) {
+
+                        const verify = await fetch("/bookings/verify-payment", {
+                            method: "POST",
+                            credentials: "include",
+                            headers: {
+                                "Content-Type": "application/json"
+                            },
+                            body: JSON.stringify({
+                                razorpay_payment_id: response.razorpay_payment_id,
+                                razorpay_order_id: response.razorpay_order_id,
+                                razorpay_signature: response.razorpay_signature
+                            })
+                        });
+
+                        const result = await verify.json();
+
+                        if (result.success) {
+                            alert("Payment Successful! Booking Confirmed.");
+                            window.location.href = "/bookings/my-bookings";
+                        } else {
+                            alert("Payment verification failed!");
+                        }
+                    },
+
+                    modal: {
+                        ondismiss: function() {
+                            alert("Payment cancelled");
+                        }
+                    }
+                };
+
+                const rzp = new Razorpay(options);
+                rzp.open();
+
+            } catch (err) {
+                console.log(err);
+                alert("Something went wrong. Try again.");
+            }
+        });
+    </script>
+
+
+
+    <script>
+        // ================= DISABLE BOOKED DATES =================
+        const booked = JSON.parse(localStorage.getItem("bookedDates") || "[]");
+
+        function checkDate(input) {
+            input.addEventListener("change", function() {
+                if (booked.includes(this.value)) {
+                    alert("This date is already booked!");
+                    this.value = "";
+                }
+            });
+        }
+
+        checkDate(document.getElementById("fromDate"));
+        checkDate(document.getElementById("toDate"));
+    </script>
