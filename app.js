@@ -78,13 +78,16 @@ const sessionOption = {
     secret: process.env.SESSION_SECRET,
     resave: false,
     saveUninitialized: false,
+    proxy: true,
+
     cookie: {
         httpOnly: true,
-        sameSite: "lax",
-        expires: Date.now() + 7 * 24 * 60 * 60 * 1000,
-        maxAge: 7 * 24 * 60 * 60 * 1000,
+        secure: true, // REQUIRED for HTTPS
+        sameSite: "none", // VERY IMPORTANT
+        maxAge: 1000 * 60 * 60 * 24 * 7
     },
 };
+app.set("trust proxy", 1);
 app.use(session(sessionOption));
 app.use(flash());
 
